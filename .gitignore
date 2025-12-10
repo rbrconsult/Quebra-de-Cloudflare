@@ -55,3 +55,13 @@ coverage.xml
 
 # Node modules (se usar JavaScript)
 node_modules/
+
+# FOTUS Auth - Arquivos sensíveis
+.fotus_token_cache.json
+fotus_token.json
+debug_*.png
+
+# Credenciais (nunca commitar!)
+*_credentials.json
+*_secrets.json
+*.key
