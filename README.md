@@ -2,32 +2,24 @@
 
 Sistema completo de autenticação automática para FOTUS com bypass do **Cloudflare Turnstile** usando **2Captcha**.
 
-## 🎯 Características
+---
 
-✅ **Bypass automático do Cloudflare Turnstile**  
-✅ **Integração com 2Captcha** para resolver desafios  
-✅ **Cache inteligente de tokens** (evita logins desnecessários)  
-✅ **Renovação automática** quando token expira  
-✅ **Modo headless** para automação completa  
-✅ **Modo visível** para debug  
-✅ **Extração automática de JWT** do localStorage  
-✅ **Logging detalhado** de todo o processo  
+## ⭐ **VERSÃO RECOMENDADA: V3 HÍBRIDA**
+
+**Use `fotus_auth_v3.py`** - Combina o melhor de todas as versões anteriores!
+
+✅ **HTTPS** nas APIs (segurança)  
+✅ **Anti-detecção completo** (plugins, languages, webdriver)  
+✅ **wait_for_url()** nativo do Playwright  
+✅ **Cria input** se não existir (mais robusto)  
+✅ **CLI completo** (--balance, --clear, --visible, --force)  
+✅ **Renovação automática** de token  
+✅ **Cache persistente**  
+✅ **Screenshots de debug** em múltiplos pontos  
 
 ---
 
-## 📋 Requisitos
-
-### Software
-- Python 3.7+
-- Playwright
-- Requests
-
-### Serviços
-- Conta no [2Captcha](https://2captcha.com) com saldo
-
----
-
-## 🚀 Instalação
+## 🚀 Instalação Rápida
 
 ### 1. Clone o repositório
 ```bash
@@ -41,66 +33,51 @@ pip install playwright requests
 playwright install chromium
 ```
 
-### 3. Configure suas credenciais
-
-Edite o arquivo `fotus_auth_2captcha.py` e atualize:
-
-```python
-# Credenciais FOTUS
-CREDENTIALS = {
-    "email": "seu@email.com",
-    "password": "sua_senha"
-}
-
-# API Key 2Captcha
-CAPTCHA_API_KEY = "sua_api_key_aqui"
+### 3. Execute
+```bash
+python fotus_auth_v3.py
 ```
+
+**📖 Instruções completas para Mac**: [INSTALACAO_MAC.md](INSTALACAO_MAC.md)
 
 ---
 
 ## 💻 Uso
 
-### Uso Standalone
+### Standalone
 
 ```bash
 # Login automático (headless)
-python fotus_auth_2captcha.py
+python fotus_auth_v3.py
 
 # Mostra navegador (debug)
-python fotus_auth_2captcha.py --visible
+python fotus_auth_v3.py --visible
 
-# Força novo login (ignora cache)
-python fotus_auth_2captcha.py --force
+# Ver saldo 2Captcha
+python fotus_auth_v3.py --balance
+
+# Limpar cache
+python fotus_auth_v3.py --clear
+
+# Forçar novo login
+python fotus_auth_v3.py --force
 ```
 
-### Uso como Módulo Python
+### Como Módulo Python
 
 ```python
-from fotus_auth_2captcha import FotusAuth2Captcha
+from fotus_auth_v3 import FotusAuth
 
 # Inicializa
-auth = FotusAuth2Captcha(
-    email="seu@email.com",
-    password="sua_senha",
-    captcha_api_key="sua_key_2captcha",
-    headless=True
-)
+auth = FotusAuth()
 
-# Obtém token (usa cache se válido, senão faz login)
+# Obtém token (automático: cache ou login)
 token = auth.get_token()
 
-# Usa token em requisições
+# Usa em requisições
 import requests
 headers = {'Authorization': f'Bearer {token}'}
 response = requests.get('https://app.fotus.com.br/api/endpoint', headers=headers)
-```
-
-### Exemplos Completos
-
-Veja o arquivo `exemplo_uso.py` para exemplos detalhados:
-
-```bash
-python exemplo_uso.py
 ```
 
 ---
@@ -108,17 +85,19 @@ python exemplo_uso.py
 ## 🔄 Fluxo de Funcionamento
 
 ```
-1. 🌐 Playwright abre a página de login
+1. 🌐 Playwright abre a página
 2. 🔍 Detecta o Cloudflare Turnstile
-3. 📤 Envia desafio para 2Captcha resolver
-4. ⏳ Aguarda resolução (30-120 segundos)
-5. 💉 Injeta resposta do captcha na página
+3. 📤 Envia para 2Captcha resolver
+4. ⏳ Aguarda resolução (30-120s)
+5. 💉 Injeta a resposta do captcha
 6. 📝 Preenche email e senha
 7. 🔘 Clica no botão de login
 8. ✅ Aguarda redirecionamento
 9. 🎫 Extrai token JWT do localStorage
-10. 💾 Salva token em cache
+10. 💾 Salva token em cache (.fotus_token_cache.json)
 ```
+
+**Renovação automática**: Token é renovado automaticamente antes de expirar!
 
 ---
 
@@ -126,66 +105,58 @@ python exemplo_uso.py
 
 ```
 Quebra-de-Cloudflare/
-├── fotus_auth_2captcha.py      # ⭐ Script principal com 2Captcha
-├── fotus_auth.py               # Script original (sem 2Captcha)
+├── fotus_auth_v3.py            # ⭐ VERSÃO RECOMENDADA (híbrida)
+├── fotus_auth_2captcha.py      # Versão original Manus
+├── fotus_auth.py               # Versão sem 2Captcha (referência)
 ├── captura_token_manual.py     # Captura manual via navegador
-├── fotus_auth_renovacao.py     # Sistema de renovação automática
+├── fotus_auth_renovacao.py     # Sistema de renovação
 ├── exemplo_uso.py              # Exemplos de uso
 ├── README.md                   # Esta documentação
+├── INSTALACAO_MAC.md           # Instruções para Mac
+├── QUICKSTART.md               # Guia rápido de 5 minutos
 ├── requirements.txt            # Dependências Python
 └── .fotus_token_cache.json     # Cache de token (gerado automaticamente)
 ```
 
 ---
 
-## 🔧 Configuração Avançada
+## 🎯 Características da V3
 
-### Timeout do Captcha
+### **Segurança**
+- ✅ HTTPS em todas as APIs
+- ✅ Anti-detecção completo (webdriver, plugins, languages)
+- ✅ Fingerprint realista
 
-Por padrão, aguarda até 120 segundos para resolver o captcha. Para alterar:
+### **Robustez**
+- ✅ Múltiplos métodos de detecção de Turnstile
+- ✅ Cria input cf-turnstile-response se não existir
+- ✅ Fallbacks em todos os pontos críticos
+- ✅ Screenshots de debug automáticos
 
-```python
-captcha_response = self.captcha_solver.solve_turnstile(
-    sitekey, 
-    LOGIN_URL,
-    timeout=180  # 3 minutos
-)
-```
+### **Automação**
+- ✅ Renovação automática de token
+- ✅ Cache persistente
+- ✅ Zero interação manual necessária
+- ✅ Margem de 10 minutos antes de expirar
 
-### Margem de Renovação
-
-Token é renovado 30 minutos antes de expirar. Para alterar:
-
-```python
-# Em fotus_auth_renovacao.py
-RENEWAL_MARGIN_MINUTES = 60  # Renova 1 hora antes
-```
-
-### Endpoints da API
-
-Ajuste as URLs conforme necessário:
-
-```python
-LOGIN_URL = "https://app.fotus.com.br/login"
-API_BASE_URL = "https://app.fotus.com.br/api"
-```
+### **Debug**
+- ✅ Screenshots em pontos-chave
+- ✅ Logging detalhado
+- ✅ Modo visível para troubleshooting
+- ✅ Limpeza automática após sucesso
 
 ---
 
 ## 💰 Custos 2Captcha
 
 - **Cloudflare Turnstile**: ~$2.00 por 1000 resoluções
+- **100 logins**: ~$0.20
 - **Tempo médio**: 30-120 segundos por resolução
-- **Recarregue em**: https://2captcha.com
 
 ### Verificar Saldo
 
-```python
-from fotus_auth_2captcha import TwoCaptchaSolver
-
-solver = TwoCaptchaSolver("sua_api_key")
-balance = solver.get_balance()
-print(f"Saldo: ${balance:.2f}")
+```bash
+python fotus_auth_v3.py --balance
 ```
 
 ---
@@ -194,35 +165,23 @@ print(f"Saldo: ${balance:.2f}")
 
 ### ❌ "Token não encontrado"
 
-**Causa**: Token não está no localStorage  
-**Solução**: 
-1. Execute com `--visible` para ver o que acontece
-2. Verifique se login foi bem-sucedido
-3. Verifique se está sendo redirecionado para /home ou /dashboard
+**Solução**: Execute com `--visible` para ver o que acontece
+```bash
+python fotus_auth_v3.py --visible
+```
 
-### ❌ "Sitekey não encontrado"
+### ❌ "Saldo insuficiente"
 
-**Causa**: Não conseguiu extrair sitekey do Turnstile  
-**Solução**:
-1. Screenshot é salvo automaticamente em `debug_turnstile.png`
-2. Verifique se o Cloudflare está ativo
-3. Tente executar com `--visible` para debug
+**Solução**: Recarregue em https://2captcha.com
 
-### ❌ "Timeout esperando Cloudflare"
+### ❌ "Login falhou"
 
-**Causa**: 2Captcha demorou muito ou falhou  
-**Solução**:
-1. Verifique saldo do 2Captcha
-2. Aumente o timeout
-3. Tente novamente (pode ser instabilidade temporária)
-
-### ❌ "Campo de email não encontrado"
-
-**Causa**: Seletores CSS mudaram  
-**Solução**:
-1. Execute com `--visible` para ver a página
-2. Inspecione os campos e atualize os seletores no código
-3. Veja screenshot em `debug_login.png`
+**Solução**: Verifique os screenshots de debug:
+- `debug_01_inicial.png`
+- `debug_02_pos_captcha.png`
+- `debug_03_formulario.png`
+- `debug_04_pos_login.png`
+- `debug_erro_login.png`
 
 ---
 
@@ -233,14 +192,18 @@ O token é salvo em `.fotus_token_cache.json`:
 ```json
 {
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "expiry": "2024-12-10T20:30:00",
-  "refresh_token": "...",
-  "updated_at": "2024-12-10T15:30:00"
+  "expiry": "2024-12-10T23:30:00",
+  "updated": "2024-12-10T18:30:00"
 }
 ```
 
 ### Limpar Cache
 
+```bash
+python fotus_auth_v3.py --clear
+```
+
+Ou manualmente:
 ```bash
 rm .fotus_token_cache.json
 ```
@@ -253,7 +216,7 @@ rm .fotus_token_cache.json
 
 - **Nunca commite** credenciais no Git
 - Use variáveis de ambiente para dados sensíveis
-- Adicione `.fotus_token_cache.json` ao `.gitignore`
+- `.fotus_token_cache.json` já está no `.gitignore`
 - Proteja sua API Key do 2Captcha
 
 ### Usando Variáveis de Ambiente
@@ -261,11 +224,11 @@ rm .fotus_token_cache.json
 ```python
 import os
 
-auth = FotusAuth2Captcha(
-    email=os.getenv('FOTUS_EMAIL'),
-    password=os.getenv('FOTUS_PASSWORD'),
-    captcha_api_key=os.getenv('CAPTCHA_API_KEY')
-)
+CREDENTIALS = {
+    "email": os.getenv('FOTUS_EMAIL'),
+    "password": os.getenv('FOTUS_PASSWORD')
+}
+CAPTCHA_API_KEY = os.getenv('CAPTCHA_API_KEY')
 ```
 
 ```bash
@@ -278,9 +241,11 @@ export CAPTCHA_API_KEY="sua_key"
 
 ## 📈 Performance
 
-- **Primeiro login**: 60-180 segundos (inclui resolução do captcha)
-- **Logins subsequentes**: < 1 segundo (usa cache)
-- **Renovação automática**: Transparente para o usuário
+| Operação | Tempo |
+|----------|-------|
+| **Primeiro login** | 60-180 segundos (inclui 2Captcha) |
+| **Logins subsequentes** | < 1 segundo (usa cache) |
+| **Renovação automática** | Transparente |
 
 ---
 
@@ -298,9 +263,20 @@ Contribuições são bem-vindas! Por favor:
 
 ## 📝 Changelog
 
-### v1.0.0 (2024-12-10)
+### v3.0.0 (2024-12-10) - **HÍBRIDA OTIMIZADA**
+- ✅ HTTPS nas APIs (segurança)
+- ✅ Anti-detecção completo
+- ✅ wait_for_url() nativo
+- ✅ Cria input se não existir
+- ✅ CLI completo (--balance, --clear)
+- ✅ Screenshots em múltiplos pontos
+- ✅ Limpeza automática de debug
+
+### v2.0.0 (2024-12-10)
 - ✅ Integração com 2Captcha
 - ✅ Bypass automático do Cloudflare Turnstile
+
+### v1.0.0 (2024-12-10)
 - ✅ Cache de tokens
 - ✅ Renovação automática
 - ✅ Modo headless e visível
