@@ -25,6 +25,7 @@ CREDENTIALS = {
 CAPTCHA_API_KEY = "801e53e81ceea1b0b287a1a128231d00"
 LOGIN_URL = "https://app.fotus.com.br/login"
 TOKEN_CACHE_FILE = ".fotus_token_cache.json"
+FOTUS_TURNSTILE_SITEKEY = "0x4AAAAAACCs0CK5Bg2jZ-lT"  # Fallback hardcoded
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s | %(levelname)s | %(message)s', datefmt='%H:%M:%S')
 logger = logging.getLogger(__name__)
@@ -194,8 +195,9 @@ class FotusAuth:
         except:
             pass
         
-        logger.error("❌ Sitekey não encontrada em nenhum método!")
-        return None
+        logger.warning("⚠️ Sitekey não encontrada dinamicamente!")
+        logger.info(f"🔑 Usando sitekey hardcoded: {FOTUS_TURNSTILE_SITEKEY[:30]}...")
+        return FOTUS_TURNSTILE_SITEKEY
     
     def _inject_response(self, page, token: str):
         page.evaluate(f'''() => {{
