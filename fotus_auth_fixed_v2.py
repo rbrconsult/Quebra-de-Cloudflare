@@ -345,25 +345,31 @@ class FotusAuth:
                     time.sleep(15)
                     page.screenshot(path='debug_05b_apos_espera.png')
                     
-                    # Verifica se Turnstile foi aceito
-                    try:
-                        turnstile_success = page.evaluate('''() => {
-                            const input = document.querySelector('input[name="cf-turnstile-response"]');
-                            return input && input.value && input.value.length > 0;
-                        }''')
-                        if turnstile_success:
-                            logger.info("   ✅ Turnstile aceito!")
-                        else:
-                            logger.warning("   ⚠️ Turnstile pode não ter sido aceito")
-                    except:
-                        pass
-                    
-                    logger.info("🔘 Submetendo...")
-                    btn = page.query_selector('button[type="submit"]')
-                    if btn:
-                        btn.click()
+                    # Verifica se já redirecionou para /home
+                    if 'home' in page.url.lower():
+                        logger.info("✅ Já redirecionou para /home automaticamente!")
                     else:
-                        page.keyboard.press('Enter')
+                        logger.info("🔍 Ainda na página de login, verificando Turnstile...")
+                        
+                        # Verifica se Turnstile foi aceito
+                        try:
+                            turnstile_success = page.evaluate('''() => {
+                                const input = document.querySelector('input[name="cf-turnstile-response"]');
+                                return input && input.value && input.value.length > 0;
+                            }''')
+                            if turnstile_success:
+                                logger.info("   ✅ Turnstile aceito!")
+                            else:
+                                logger.warning("   ⚠️ Turnstile pode não ter sido aceito")
+                        except:
+                            pass
+                        
+                        logger.info("🔘 Clicando Entrar novamente...")
+                        btn = page.query_selector('button[type="submit"]')
+                        if btn:
+                            btn.click()
+                        else:
+                            page.keyboard.press('Enter')
                 
                 logger.info("⏳ Aguardando /home...")
                 try:
