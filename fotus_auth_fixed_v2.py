@@ -200,10 +200,13 @@ class FotusAuth:
         return FOTUS_TURNSTILE_SITEKEY
     
     def _inject_response(self, page, token: str):
+        """Injeta resposta do Turnstile com múltiplas tentativas de callback"""
         page.evaluate(f'''() => {{
+            // 1. Preenche inputs existentes
             document.querySelectorAll('input[name="cf-turnstile-response"]')
                 .forEach(i => i.value = "{token}");
             
+            // 2. Cria input se não existir
             if (!document.querySelector('input[name="cf-turnstile-response"]')) {{
                 let input = document.createElement('input');
                 input.type = 'hidden';
@@ -212,12 +215,56 @@ class FotusAuth:
                 document.querySelector('form')?.appendChild(input);
             }}
             
+            // 3. Tenta encontrar e chamar callback do Turnstile (múltiplos métodos)
+            
+            // Método 1: window.turnstile.callback
             if (window.turnstile?.callback) {{
-                try {{ window.turnstile.callback("{token}"); }} catch(e) {{}}
+                try {{
+                    console.log('[INJECT] Chamando window.turnstile.callback');
+                    window.turnstile.callback("{token}");
+                }} catch(e) {{ console.error('[INJECT] Erro callback:', e); }}
             }}
             
+            // Método 2: Procura callback em widgets
+            try {{
+                const widgets = document.querySelectorAll('.cf-turnstile, [data-sitekey]');
+                widgets.forEach(widget => {{
+                    if (widget._callback) {{
+                        console.log('[INJECT] Chamando widget._callback');
+                        widget._callback("{token}");
+                    }}
+                }});
+            }} catch(e) {{ console.error('[INJECT] Erro widget callback:', e); }}
+            
+            // Método 3: Dispara eventos customizados
+            try {{
+                const event = new CustomEvent('cf-turnstile-response', {{
+                    detail: {{ token: "{token}" }},
+                    bubbles: true,
+                    cancelable: true
+                }});
+                document.dispatchEvent(event);
+                console.log('[INJECT] Evento cf-turnstile-response disparado');
+            }} catch(e) {{ console.error('[INJECT] Erro evento:', e); }}
+            
+            // Método 4: Dispara eventos change nos inputs
             document.querySelectorAll('input[name="cf-turnstile-response"]')
-                .forEach(i => i.dispatchEvent(new Event('change', {{bubbles: true}})));
+                .forEach(i => {{
+                    i.dispatchEvent(new Event('input', {{bubbles: true}}));
+                    i.dispatchEvent(new Event('change', {{bubbles: true}}));
+                }});
+            
+            // Método 5: Tenta marcar checkbox visualmente (se existir)
+            try {{
+                const checkbox = document.querySelector('.cf-turnstile input[type="checkbox"]');
+                if (checkbox) {{
+                    checkbox.checked = true;
+                    checkbox.dispatchEvent(new Event('change', {{bubbles: true}}));
+                    console.log('[INJECT] Checkbox marcado');
+                }}
+            }} catch(e) {{ console.error('[INJECT] Erro checkbox:', e); }}
+            
+            console.log('[INJECT] Injeção completa');
         }}''')
     
     def _extract_token(self, page) -> Optional[str]:
@@ -339,6 +386,7 @@ class FotusAuth:
                     
                     logger.info("💉 Injetando...")
                     self._inject_response(page, captcha_token)
+                    time.sleep(2)  # Aguarda JavaScript processar
                     page.screenshot(path='debug_05_injetado.png')
                     
                     logger.info("⏳ Aguardando Cloudflare validar (15s)...")
