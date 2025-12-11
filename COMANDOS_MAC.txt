@@ -1,0 +1,150 @@
+═══════════════════════════════════════════════════════════════
+🍎 COMANDOS RÁPIDOS PARA MAC - FOTUS AUTH V3
+═══════════════════════════════════════════════════════════════
+
+📥 INSTALAÇÃO
+═══════════════════════════════════════════════════════════════
+
+# 1. Clone o repositório
+cd ~/Desktop
+git clone https://github.com/rbrconsult/Quebra-de-Cloudflare.git
+cd Quebra-de-Cloudflare
+
+# 2. Instale dependências
+pip3 install playwright requests
+playwright install chromium
+
+═══════════════════════════════════════════════════════════════
+✅ TESTES
+═══════════════════════════════════════════════════════════════
+
+# Ver saldo 2Captcha
+python3 fotus_auth_v3.py --balance
+
+# Primeiro teste (modo visível para debug)
+python3 fotus_auth_v3.py --visible
+
+# Teste headless (automação)
+python3 fotus_auth_v3.py
+
+═══════════════════════════════════════════════════════════════
+🔧 COMANDOS ÚTEIS
+═══════════════════════════════════════════════════════════════
+
+# Login normal (headless)
+python3 fotus_auth_v3.py
+
+# Login com navegador visível (debug)
+python3 fotus_auth_v3.py --visible
+
+# Forçar novo login (ignora cache)
+python3 fotus_auth_v3.py --force
+
+# Limpar cache
+python3 fotus_auth_v3.py --clear
+
+# Ver saldo 2Captcha
+python3 fotus_auth_v3.py --balance
+
+═══════════════════════════════════════════════════════════════
+📁 ARQUIVOS IMPORTANTES
+═══════════════════════════════════════════════════════════════
+
+fotus_auth_v3.py              ← Script principal (V3 híbrida)
+.fotus_token_cache.json       ← Token salvo aqui (gerado automaticamente)
+INSTALACAO_MAC.md             ← Instruções detalhadas
+README.md                     ← Documentação completa
+
+═══════════════════════════════════════════════════════════════
+🔍 VERIFICAR TOKEN SALVO
+═══════════════════════════════════════════════════════════════
+
+# Ver conteúdo do cache
+cat .fotus_token_cache.json
+
+# Ver token formatado
+cat .fotus_token_cache.json | python3 -m json.tool
+
+═══════════════════════════════════════════════════════════════
+💻 USAR COMO MÓDULO
+═══════════════════════════════════════════════════════════════
+
+# Criar arquivo teste.py:
+cat > teste.py << 'EOF'
+from fotus_auth_v3 import FotusAuth
+
+auth = FotusAuth()
+token = auth.get_token()
+
+print(f"Token: {token[:50]}...")
+print(f"Expira: {auth.token_expiry}")
+EOF
+
+# Executar
+python3 teste.py
+
+═══════════════════════════════════════════════════════════════
+🐛 DEBUG
+═══════════════════════════════════════════════════════════════
+
+# Ver screenshots de debug (se houver erro)
+ls -la debug_*.png
+
+# Abrir screenshot
+open debug_01_inicial.png
+
+# Ver logs em tempo real
+python3 fotus_auth_v3.py --visible 2>&1 | tee log.txt
+
+═══════════════════════════════════════════════════════════════
+🔄 ATUALIZAR CÓDIGO
+═══════════════════════════════════════════════════════════════
+
+# Puxar última versão do GitHub
+git pull origin master
+
+# Ver mudanças
+git log --oneline -5
+
+═══════════════════════════════════════════════════════════════
+🗑️ LIMPAR TUDO
+═══════════════════════════════════════════════════════════════
+
+# Remover cache e screenshots
+rm .fotus_token_cache.json debug_*.png
+
+# Reinstalar dependências
+pip3 uninstall playwright requests -y
+pip3 install playwright requests
+playwright install chromium
+
+═══════════════════════════════════════════════════════════════
+📊 MONITORAMENTO
+═══════════════════════════════════════════════════════════════
+
+# Ver saldo e calcular resoluções restantes
+python3 fotus_auth_v3.py --balance
+
+# Loop de teste (renovação automática)
+while true; do
+  python3 fotus_auth_v3.py
+  echo "Aguardando 1 hora..."
+  sleep 3600
+done
+
+═══════════════════════════════════════════════════════════════
+🎯 PRÓXIMO PASSO APÓS TESTE BEM-SUCEDIDO
+═══════════════════════════════════════════════════════════════
+
+1. ✅ Verificar que .fotus_token_cache.json foi criado
+2. ✅ Confirmar que token está válido
+3. ✅ Integrar no seu scraper/automação
+4. ✅ Configurar renovação automática
+
+═══════════════════════════════════════════════════════════════
+📞 SUPORTE
+═══════════════════════════════════════════════════════════════
+
+GitHub Issues: https://github.com/rbrconsult/Quebra-de-Cloudflare/issues
+
+═══════════════════════════════════════════════════════════════
